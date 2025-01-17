@@ -6,3 +6,11 @@
 db
 /db
 ./db
+
+ccsd/pom.xml
+ccsd/src/main/resources/application.properties
+ccsd/src/main/resources/profpic.png
+dashboard/debug.log
+dashboard/package-lock.json
+dashboard/package.json
+dashboard/yarn.lock

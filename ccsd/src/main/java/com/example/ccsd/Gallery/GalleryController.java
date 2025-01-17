@@ -1,10 +1,7 @@
 package com.example.ccsd.Gallery;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,33 +22,25 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/Gallery")
 
-public class galleryController {
-    
+public class GalleryController {
+
     @Autowired
-    private galleryService GalleryService;
+    private com.example.ccsd.Gallery.GalleryService GalleryService;
 
     @GetMapping
-    public List<gallery> getAllGallerys() {
-        List<gallery> galleryList = GalleryService.getAllGallerys();
-        
-
-        return galleryList.stream()
-        .map(gallery -> {
-                // Add Base64 encoded image to each
-            gallery.setImage64String(gallery.getImageAsBase64());
-            return gallery;
-        })
-        .collect(Collectors.toList()); 
+    public ResponseEntity<List<Gallery>> getAllGallerys() {
+        List<Gallery> galleryList = GalleryService.getAllGallerys();
+        return ResponseEntity.ok(galleryList);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<gallery> getGalleryById(@PathVariable String id) {
+    public ResponseEntity<Object> getGalleryById(@PathVariable String id) {
         return GalleryService.getGalleryById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-     @PostMapping
+    @PostMapping
     public ResponseEntity<Map<String, Object>> addGallery(
             @RequestParam("title") String title,
             @RequestParam("postSlug") String postSlug,
@@ -64,30 +53,31 @@ public class galleryController {
             @RequestParam("image") MultipartFile image) throws IOException {
 
         byte[] imageBytes = image.getBytes();
+        String base64String = Base64.getEncoder().encodeToString(imageBytes);
 
-        gallery Gallery = new gallery();
+        Gallery Gallery = new Gallery();
         Gallery.setTitle(title);
         Gallery.setPostSlug(postSlug);
-        Gallery.setpostShortDescription(postShortDescription);
+        Gallery.setPostShortDescription(postShortDescription);
         Gallery.setTag(tag);
         Gallery.setPlace(place);
         Gallery.setDate(date);
         Gallery.setStatus(status);
-        Gallery.setimage(imageBytes);
-        Gallery.setContent(content);  
-        
-        gallery savedGallery = GalleryService.addGallery(Gallery);
+        Gallery.setImage(base64String);
+        Gallery.setContent(content);
+
+        Gallery savedGallery = GalleryService.addGallery(Gallery);
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("product", savedGallery);
-        
+
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<gallery> updategallery(@PathVariable String id, @RequestBody gallery GalleryDetails) {
-        gallery updatedgallery = GalleryService.updategallery(id, GalleryDetails);
+    public ResponseEntity<Gallery> updategallery(@PathVariable String id, @RequestBody Gallery GalleryDetails) {
+        Gallery updatedgallery = GalleryService.updateGallery(id, GalleryDetails);
         if (updatedgallery != null) {
             return ResponseEntity.ok(updatedgallery);
         }
@@ -96,8 +86,7 @@ public class galleryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletegallery(@PathVariable String id) {
-        GalleryService.deletegallery(id);
+        GalleryService.deleteGallery(id);
         return ResponseEntity.noContent().build();
     }
-   
 }

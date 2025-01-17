@@ -47,9 +47,8 @@ public class WebsiteImagesController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-          @PostMapping
-    public ResponseEntity<Map<String, Object>> addWebsiteImages(
+    @PostMapping
+         public ResponseEntity<Map<String, Object>> addWebsiteImages(
             @RequestParam("title") String title,
             @RequestParam("postShortDescription") String postShortDescription,
             @RequestParam("date") String date,
